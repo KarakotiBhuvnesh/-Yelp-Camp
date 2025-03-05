@@ -83,7 +83,7 @@ app.all('*', (req,res,next)=>{
 app.use((err,req,res,next)=>{  
     if(!err.message) err.message='Oh no !!! Something went wrong!'
     const {statusCode = 500, message = 'Something went Wrong'} = err;
-    res.status(statusCode).render('error',{err})                                // error handling
+    res.status(statusCode).render('error',{err})                               // error handling
 })
 
 app.listen(3000,()=>{
