@@ -11,6 +11,9 @@ db.once("open",()=>{
     console.log("Database connected");
 }); 
 
+app.get('/error',(req,res)=>{
+    chicken.fly();
+})
 const sample = array => array[Math.floor(Math.random() * array.length)];             //random using math function where range is array.length
 
 const seedDB = async ()=>{
