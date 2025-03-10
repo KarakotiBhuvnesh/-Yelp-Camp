@@ -89,7 +89,7 @@ app.put('/campgrounds/:id', async(req,res) =>{
 app.delete('/campgrounds/:id',catchAsync(async(req,res)=>{
     const{id}=req.params;
     await Campground.findByIdAndDelete(id);
-    res.redirect('/campgrounds')
+    res.redirect('/campgrounds/${id}')
 }));
 
 app.post('/campgrounds/:id/reviews',validateReview,catchAsync(async(req,res)=>{
@@ -99,10 +99,15 @@ app.post('/campgrounds/:id/reviews',validateReview,catchAsync(async(req,res)=>{
     await review.save();
     await campground.save();
     res.redirect(`/campgrounds/${campground._id}`)
-
 }));
 
-app.post('/campgroeunds/:id/reviews',validateReview)
+app.delete('/campgrounds/:id/reviews/:reviewId', catchAsync(async(req,res)=>{
+    const {id,reviewId} = req.params;
+    await Campground.findByIdAndUpdate(id , {$pull:{reviews:reviewId}});
+    await Review.findByIdAndDelete(req.params.reviewId);
+    res.redirect(`/campgrounds/${id}`);
+}))
+
 app.all('*', (req,res,next)=>{
     next(new ExpressError('Page Not Found', 404))
 });
