@@ -1,11 +1,14 @@
 const express = require('express');
-const router = express('router');
+const router = express.Router();
 const catchAsync = require('../utils/catchAsync.js');
 const ExpressError = require('../utils/ExpressError.js');
 const Campground = require('../models/campgrounds.js');
+const {campgroundSchema} = require('../schemas.js')
+
 
 
 const validateCampground = (req,res,next)=>{                       //validation middleware
+    console.log(req.body);
     const {error} = campgroundSchema.validate(req.body);
     if(error){
         const msg = error.details.map(el=>el.message).join(',')
@@ -14,7 +17,6 @@ const validateCampground = (req,res,next)=>{                       //validation 
         next();
     }
 }
-
 
 router.get('', catchAsync(async (req,res)=>{
     const campgrounds = await Campground.find({});
@@ -25,10 +27,11 @@ router.get('/new', async (req,res)=>{                     // adding new campgrou
     res.render('campgrounds/new');
 });
 
-router.post('', validateCampground,catchAsync(async(req,res,next)=>{
+router.post('/', validateCampground,catchAsync(async(req,res,next)=>{
     const campground = new Campground(req.body.campground);
     await campground.save();
-    res.redirect(`/campgrounds/${campground._id}`)
+    req.flash('success','Successfully made a new campgrounds');
+    res.redirect(`/campgrounds/${campground._id}`);
 }));
 
 
@@ -45,7 +48,8 @@ router.get('/:id/edit',catchAsync(async(req,res)=>{
 
 router.put('/:id', async(req,res) =>{
     const {id} = req.params;
-    const campground = await Campground.findByIdAndUpdate(id,{...req.body.campground})
+    const campground = await Campground.findByIdAndUpdate(id,{...req.body.campground});
+    req.flash('success','successfully updated a campground!!')
     res.redirect(`/campgrounds/${campground.id}`);
 });
 
